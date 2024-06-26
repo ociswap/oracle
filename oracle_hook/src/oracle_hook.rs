@@ -1,5 +1,5 @@
 use common::hooks::{AfterInstantiateState, AfterSwapState, HookCall};
-use common::oracle::*;
+use oracle::{Oracle, ObservationInterval, AccumulatedObservation};
 use common::time::Time;
 use scrypto::prelude::*;
 

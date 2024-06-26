@@ -163,8 +163,8 @@ dependencies = [
 
 [[package]]
 name = "common"
-version = "1.0.3"
-source = "git+ssh://git@github.com/ociswap/pools-common.git#a35604154f150a6d20291dfe43b3242f2df38b9e"
+version = "1.0.4"
+source = "git+ssh://git@github.com/ociswap/pools-common.git#10a74aa8bc24e64400d6b7f8dd01104bdce06a66"
 dependencies = [
  "pretty_assertions",
  "sbor",
@@ -605,7 +605,7 @@ checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 
 [[package]]
 name = "oracle"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "common",
  "pretty_assertions",
