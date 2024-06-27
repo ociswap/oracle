@@ -26,4 +26,4 @@ oracle_hook = { path = "." }
 test-case = "3"
 
 [lib]
-crate-type = ["lib"]
+crate-type = ["cdylib", "lib"]
