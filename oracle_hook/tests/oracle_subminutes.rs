@@ -1,12 +1,9 @@
 mod helper;
-use common::{
-    hooks::AfterSwapState,
-    oracle::{AccumulatedObservation, ObservationInterval},
-};
+use flex_pool_hooks::AfterSwapState;
+use oracle::AccumulatedObservation;
 use helper::*;
 use pretty_assertions::assert_eq;
 use scrypto::prelude::*;
-use scrypto_math::*;
 use scrypto_testenv::environment::TestHelperExecution;
 use test_case::test_case;
 

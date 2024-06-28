@@ -1,4 +1,4 @@
-use common::hooks::{AfterInstantiateState, AfterSwapState, HookCall};
+use flex_pool_hooks::{AfterInstantiateState, HookCall};
 use oracle::{Oracle, ObservationInterval, AccumulatedObservation};
 use common::time::Time;
 use scrypto::prelude::*;
@@ -6,7 +6,7 @@ use scrypto::prelude::*;
 #[blueprint]
 #[types(u16, AccumulatedObservation)]
 mod oracle_hook {
-    use common::hooks::AfterSwapState;
+    use flex_pool_hooks::AfterSwapState;
 
     enable_method_auth! {
         roles {

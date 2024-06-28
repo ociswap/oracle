@@ -1,9 +1,8 @@
-use common::oracle::{AccumulatedObservation, ObservationInterval};
+use oracle::{AccumulatedObservation, ObservationInterval};
 use lazy_static::lazy_static;
 use scrypto::{blueprints::consensus_manager::TimePrecision, prelude::*};
 use std::mem;
-
-use common::hooks::{AfterInstantiateState, AfterSwapState, HookCall};
+use flex_pool_hooks::{AfterInstantiateState, AfterSwapState, HookCall};
 use common::pools::SwapType;
 use pretty_assertions::assert_eq;
 use radix_engine::system::system_modules::execution_trace::ResourceSpecifier::Amount;
@@ -385,9 +384,9 @@ impl OracleTestHelper {
 
     pub fn new() -> Self {
         let packages: HashMap<&str, &str> = vec![
-            ("oracle", ".."),
-            ("pool", "flex_pool"),
-            ("registry", "registry"),
+            ("oracle", this_package!()),
+            ("pool", concat!(this_package!(), "/../flex-pool")),
+            ("registry", concat!(this_package!(), "/../flex-pool/registry")),
         ]
         .into_iter()
         .collect();
@@ -835,10 +834,6 @@ impl OracleTestHelper {
         self.advance_timestamp_by_seconds(minutes * 60);
     }
 
-    // pub fn advance_to_timestamp_seconds(&mut self, timestamp: u64){
-    //     self.env.test_runner.advance_to_round_at_timestamp();
-    // }
-
     pub fn x_address(&self) -> ResourceAddress {
         self.env.x_address
     }
@@ -1047,7 +1042,6 @@ pub fn generate_oracle_data(
     Vec<AccumulatedObservation>,
     PreciseDecimal,
 ) {
-    // assert_eq!(values.len(), seconds.len());
     assert_ne!(seconds[0], 0);
     let values = TEST_DATAPOINTS.clone();
 

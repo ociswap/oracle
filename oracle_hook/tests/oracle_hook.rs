@@ -1,19 +1,18 @@
 mod helper;
-use common::oracle::{AccumulatedObservation, ObservationInterval};
-use common::{hooks::HookCall, oracle::accumulated_log};
+use oracle::{AccumulatedObservation, ObservationInterval, oracle::accumulated_log};
+use flex_pool_hooks::HookCall;
 use helper::*;
 use pretty_assertions::assert_eq;
 use scrypto::prelude::*;
 use scrypto_testenv::environment::TestHelperExecution;
 use std::ops::Range;
-use test_case::{test_case, test_matrix};
+use test_case::test_case;
 
 #[test]
 fn test_instantiate_instant() {
     let mut helper = OracleTestHelper::new();
     helper.instantiate_instant();
     helper.execute_expect_success(false);
-    // TODO test hook badge
 }
 
 // Test access
@@ -89,11 +88,6 @@ fn test_after_swap_assert_outputs_equal_inputs() {
     helper.assert_outputs_equal_inputs(HookCall::AfterSwap);
 }
 
-// #[test]
-// fn test_after_swap_assert_outputs_equal_inputs() {
-//     let mut helper = OracleTestHelper::new();
-//     helper.assert_outputs_equal_inputs(HookCall::AfterSwap);
-// }
 
 // Test ranges
 
@@ -455,16 +449,6 @@ fn test_binary_search_observations(
 
     assert_eq!(output, expected);
 
-    // let expected =
-    // for obs in TEST_ACCUMULATED_OBSERVATIONS[timestamp_indexes].to_vec() {
-    //     if expect_success {
-    //         let receipt = helper.observation(obs.timestamp).execute_expect_success(true);
-    //         let output: Vec<AccumulatedObservation> = receipt.outputs("observation");
-    //         assert_vecs_similar(output, vec![obs]);
-    //     } else {
-    //         helper.observation(obs.timestamp).execute_expect_failure(true);
-    //     }
-    // }
 }
 
 // Interpolation
@@ -485,8 +469,6 @@ fn test_interpolation() {
         get_observation(&observations_expected, 4 * 60),
         get_observation(&observations_expected, 8 * 60),
     ];
-
-    // println!("{:#?}", outputs);
 
     assert_vecs_similar(outputs, expected);
 }
@@ -568,8 +550,6 @@ fn test_observation_intervals() {
     )];
 
     assert_eq!(outputs, expected);
-    // assert_eq!(outputs.len(), 1);
-    // assert_vecs_similar(outputs[0].clone(), expected);
 }
 
 #[test]
@@ -592,9 +572,3 @@ fn test_observation_intervals_seconds_rounding() {
 
     assert_eq!(outputs, expected);
 }
-
-// ----------------------------------------
-
-// Test Observation struct fields overflows
-
-// test get observations/get_observation_for_timestamp, make sure they panic on invalid inputs, of when they ask for data when the oracle is still empty

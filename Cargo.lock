@@ -330,6 +330,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f830c31a9c9fb94e2d27fbc76daf642784ce14eb3910d4719e29b50ccda5d0f0"
 
 [[package]]
+name = "flex_pool_hooks"
+version = "0.1.1"
+dependencies = [
+ "common",
+ "sbor",
+ "scrypto",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -617,6 +626,7 @@ name = "oracle_hook"
 version = "1.0.0"
 dependencies = [
  "common",
+ "flex_pool_hooks",
  "lazy_static",
  "oracle",
  "oracle_hook",
