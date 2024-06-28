@@ -171,15 +171,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
-version = "1.0.5"
-source = "git+https://github.com/ociswap/pools-common#358255af17b8b002435b390cbc25d67cfa347c96"
-dependencies = [
- "sbor",
- "scrypto",
-]
-
-[[package]]
 name = "const-sha1"
 version = "0.2.0"
 source = "git+https://github.com/radixdlt/const-sha1#5e9ae2a99e9c76e85aa67f42e4b62e7f7ce8dad4"
@@ -342,7 +333,7 @@ checksum = "f830c31a9c9fb94e2d27fbc76daf642784ce14eb3910d4719e29b50ccda5d0f0"
 name = "flex_pool_hooks"
 version = "0.1.1"
 dependencies = [
- "common 1.0.5 (git+https://github.com/ociswap/pools-common)",
+ "common",
  "sbor",
  "scrypto",
 ]
@@ -623,7 +614,7 @@ checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 name = "oracle"
 version = "1.0.6"
 dependencies = [
- "common 1.0.5 (git+https://github.com/ociswap/pools-common?tag=v1.0.5)",
+ "common",
  "pretty_assertions",
  "sbor",
  "scrypto",
@@ -634,7 +625,7 @@ dependencies = [
 name = "oracle_hook"
 version = "1.0.0"
 dependencies = [
- "common 1.0.5 (git+https://github.com/ociswap/pools-common?tag=v1.0.5)",
+ "common",
  "flex_pool_hooks",
  "lazy_static",
  "oracle",
