@@ -1,3 +1,0 @@
-[submodule "oracle_hook/flex-pool"]
-	path = oracle_hook/flex-pool
-	url = git@github.com:ociswap/flex-pool.git
