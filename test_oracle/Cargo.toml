@@ -4,9 +4,9 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-common = { git = "https://github.com/ociswap/pools-common", tag = "v1.0.5" }
+sbor = "1.2.0"
+scrypto = "1.2.0"
+common = { git = "https://github.com/ociswap/pools-common", tag = "v1.1.0" }
 oracle = { path = ".." }
 
 [lib]
