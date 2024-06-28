@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
 scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
-common = { git = "https://github.com/ociswap/pools-common" }
+common = { git = "https://github.com/ociswap/pools-common", tag = "v1.0.5" }
 oracle = { path = ".." }
 flex_pool_hooks = { path = "../flex-pool/hooks" }
 
@@ -27,3 +27,19 @@ test-case = "3"
 
 [lib]
 crate-type = ["cdylib", "lib"]
+
+[profile.dev]
+opt-level = 'z'
+lto = false
+codegen-units = 1
+panic = 'abort'
+strip = true
+overflow-checks = true
+
+[profile.release]
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = 'abort'
+strip = true
+overflow-checks = true

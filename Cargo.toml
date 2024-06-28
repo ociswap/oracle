@@ -1,11 +1,6 @@
-[workspace]
-members = [
-    "oracle_hook"
-]
-
 [package]
 name = "oracle"
-version = "1.0.5"
+version = "1.0.6"
 edition = "2021"
 license = "MIT"
 description = "Time-weighted average price oracle for the Ociswap pools"
@@ -16,20 +11,4 @@ sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
 scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
 scrypto_math = { git = "https://github.com/ociswap/scrypto-math", tag = "v0.4.0" }
 pretty_assertions = "1.3.0"
-common = { git = "https://github.com/ociswap/pools-common" }
-
-[profile.dev]
-opt-level = 'z'
-lto = false
-codegen-units = 1
-panic = 'abort'
-strip = true
-overflow-checks = true
-
-[profile.release]
-opt-level = 'z'
-lto = true
-codegen-units = 1
-panic = 'abort'
-strip = true
-overflow-checks = true
+common = { git = "https://github.com/ociswap/pools-common", tag = "v1.0.5" }
