@@ -1,3 +1,6 @@
+[workspace]
+members = ["test_oracle"]
+
 [package]
 name = "oracle"
 version = "1.0.6"
@@ -12,3 +15,34 @@ scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1"
 scrypto_math = { git = "https://github.com/ociswap/scrypto-math", tag = "v0.4.0" }
 pretty_assertions = "1.3.0"
 common = { git = "https://github.com/ociswap/pools-common", tag = "v1.0.5" }
+
+[dev-dependencies]
+transaction = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+radix-engine = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+scrypto-unit = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+scrypto-test = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+radix-engine-interface = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+scrypto_testenv = { git = "https://github.com/ociswap/scrypto-testenv", tag = "v0.7.0-alpha.5" }
+scrypto_math = { git = "https://github.com/ociswap/scrypto-math", tag = "v0.4.0" }
+lazy_static = "1.4.0"
+pretty_assertions = "1.3.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.107"
+test_oracle = { path = "test_oracle" }
+test-case = "3"
+
+[profile.dev]
+opt-level = 'z'
+lto = false
+codegen-units = 1
+panic = 'abort'
+strip = true
+overflow-checks = true
+
+[profile.release]
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = 'abort'
+strip = true
+overflow-checks = true

@@ -1,13 +1,56 @@
+use common::pools::SwapType;
 use common::time::Time;
-use flex_pool_hooks::{AfterInstantiateState, HookCall};
 use oracle::{AccumulatedObservation, ObservationInterval, Oracle};
 use scrypto::prelude::*;
 
+// AfterInstantiateState, AfterSwapState and HookCall can be imported normally from flex_pool_hooks package.
+// They are copied in this case to avoid circular imports. A normal hook is not imported by the pool itself
+// which is the case for the oracle. This TestOracle is not a compatible hook but freely inspired by the interface.
+
+#[derive(ScryptoSbor, ManifestSbor, Clone, Debug, PartialEq)]
+pub struct AfterInstantiateState {
+    pub pool_address: ComponentAddress,
+    pub price_sqrt: Option<PreciseDecimal>,
+    pub x_address: ResourceAddress,
+    pub y_address: ResourceAddress,
+    pub input_fee_rate: Decimal,
+    pub flash_loan_fee_rate: Decimal,
+}
+
+#[derive(ScryptoSbor, ManifestSbor, Clone, Debug, PartialEq)]
+pub struct AfterSwapState {
+    pub pool_address: ComponentAddress,
+    pub swap_type: SwapType,
+    pub price_sqrt: PreciseDecimal,
+    pub active_liquidity: PreciseDecimal,
+    pub input_fee_rate: Decimal,
+    pub fee_protocol_share: Decimal,
+    pub input_address: ResourceAddress,
+    pub input_amount: Decimal,
+    pub output_address: ResourceAddress,
+    pub output_amount: Decimal,
+    pub input_fee_lp: Decimal,
+    pub input_fee_protocol: Decimal,
+}
+
+#[derive(ScryptoSbor, Clone, Debug, PartialEq, ManifestSbor)]
+pub enum HookCall {
+    BeforeInstantiate,
+    AfterInstantiate,
+    BeforeSwap,
+    AfterSwap,
+    BeforeAddLiquidity,
+    AfterAddLiquidity,
+    BeforeRemoveLiquidity,
+    AfterRemoveLiquidity,
+}
+
+/*
+This is not a production grade hook, but
+*/
 #[blueprint]
 #[types(u16, AccumulatedObservation)]
-mod oracle_hook {
-    use flex_pool_hooks::AfterSwapState;
-
+mod test_oracle {
     enable_method_auth! {
         roles {
             hook_admin => updatable_by: [OWNER];
@@ -23,7 +66,7 @@ mod oracle_hook {
             after_swap => restrict_to: [hook_admin];
         }
     }
-    struct OracleHook {
+    struct TestOracle {
         calls: Vec<HookCall>,
 
         pool_address: Option<ComponentAddress>,
@@ -35,8 +78,8 @@ mod oracle_hook {
         last_price_sqrt: PreciseDecimal,
     }
 
-    impl OracleHook {
-        pub fn instantiate() -> (Global<OracleHook>, Bucket) {
+    impl TestOracle {
+        pub fn instantiate() -> (Global<TestOracle>, Bucket) {
             let hook_badge = ResourceBuilder::new_fungible(OwnerRole::None)
                 .divisibility(DIVISIBILITY_NONE)
                 .mint_initial_supply(1);

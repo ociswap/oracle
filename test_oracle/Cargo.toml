@@ -1,0 +1,13 @@
+[package]
+name = "test_oracle"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v1.1.1" }
+common = { git = "https://github.com/ociswap/pools-common", tag = "v1.0.5" }
+oracle = { path = ".." }
+
+[lib]
+crate-type = ["cdylib", "lib"]

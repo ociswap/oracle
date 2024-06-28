@@ -1,5 +1,4 @@
 use common::pools::SwapType;
-use flex_pool_hooks::{AfterInstantiateState, AfterSwapState, HookCall};
 use lazy_static::lazy_static;
 use oracle::{AccumulatedObservation, ObservationInterval};
 use pretty_assertions::assert_eq;
@@ -11,6 +10,7 @@ use serde_json;
 use std::fs::File;
 use std::io::Read;
 use std::mem;
+use test_oracle::test_oracle::{AfterInstantiateState, AfterSwapState, HookCall};
 
 lazy_static! {
     pub static ref TEST_DATAPOINTS: Vec<PreciseDecimal> = {
@@ -383,63 +383,19 @@ impl OracleTestHelper {
     }
 
     pub fn new() -> Self {
-        let packages: HashMap<&str, &str> = vec![
-            ("oracle", this_package!()),
-            ("pool", concat!(this_package!(), "/flex-pool")),
-            ("registry", concat!(this_package!(), "/flex-pool/registry")),
-        ]
-        .into_iter()
-        .collect();
+        let packages: HashMap<&str, &str> = vec![("oracle", "test_oracle")].into_iter().collect();
         let env = TestEnvironment::new(packages);
+
+        let fake_pool_address = env.account;
 
         let mut helper = Self {
             env,
             oracle_address: None,
-            pool_address: None,
+            pool_address: Some(fake_pool_address),
             hook_badge_address: None,
         };
 
         helper.advance_timestamp_by_seconds(60);
-
-        let manifest_builder = mem::take(&mut helper.env.manifest_builder);
-        helper.env.manifest_builder = manifest_builder.call_function(
-            helper.env.package_address("registry"),
-            "Registry",
-            "instantiate",
-            manifest_args!(
-                helper.env.admin_badge_address,
-                dec!(0),
-                100 as u64,
-                20 as u64
-            ),
-        );
-
-        let receipt = helper.execute_expect_success(false);
-        let registry_address: ComponentAddress =
-            receipt.execution_receipt.expect_commit_success().output(1);
-        // helper.pool_address = Some(registry_address);
-
-        let manifest_builder = mem::take(&mut helper.env.manifest_builder);
-        helper.env.manifest_builder = manifest_builder.call_function(
-            helper.env.package_address("pool"),
-            "FlexPool",
-            "instantiate",
-            manifest_args!(
-                helper.env.x_address,
-                helper.env.y_address,
-                dec!("0.01"),
-                dec!("0.005"),
-                dec!("0.5"),
-                registry_address,
-                Vec::<(ComponentAddress, ManifestBucket)>::new(),
-                helper.env.dapp_definition
-            ),
-        );
-
-        let receipt = helper.execute_expect_success(false);
-        let (pool_address, lp_address): (ComponentAddress, ResourceAddress) =
-            receipt.execution_receipt.expect_commit_success().output(1);
-        helper.pool_address = Some(pool_address);
 
         helper
     }
@@ -512,7 +468,7 @@ impl OracleTestHelper {
         let manifest_builder = mem::take(&mut self.env.manifest_builder);
         self.env.manifest_builder = manifest_builder.call_function(
             self.env.package_address("oracle"),
-            "OracleHook",
+            "TestOracle",
             "instantiate",
             manifest_args!(),
         );

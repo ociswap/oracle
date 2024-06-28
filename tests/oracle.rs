@@ -1,5 +1,4 @@
 mod helper;
-use flex_pool_hooks::HookCall;
 use helper::*;
 use oracle::{oracle::accumulated_log, AccumulatedObservation, ObservationInterval};
 use pretty_assertions::assert_eq;
@@ -7,6 +6,7 @@ use scrypto::prelude::*;
 use scrypto_testenv::environment::TestHelperExecution;
 use std::ops::Range;
 use test_case::test_case;
+use test_oracle::test_oracle::HookCall;
 
 #[test]
 fn test_instantiate_instant() {

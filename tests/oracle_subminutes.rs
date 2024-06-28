@@ -1,11 +1,11 @@
 mod helper;
-use flex_pool_hooks::AfterSwapState;
 use helper::*;
 use oracle::AccumulatedObservation;
 use pretty_assertions::assert_eq;
 use scrypto::prelude::*;
 use scrypto_testenv::environment::TestHelperExecution;
 use test_case::test_case;
+use test_oracle::test_oracle::AfterSwapState;
 
 #[test]
 fn test_first_minute_same_transaction() {
