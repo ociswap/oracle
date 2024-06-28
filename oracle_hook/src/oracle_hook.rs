@@ -1,6 +1,6 @@
-use flex_pool_hooks::{AfterInstantiateState, HookCall};
-use oracle::{Oracle, ObservationInterval, AccumulatedObservation};
 use common::time::Time;
+use flex_pool_hooks::{AfterInstantiateState, HookCall};
+use oracle::{AccumulatedObservation, ObservationInterval, Oracle};
 use scrypto::prelude::*;
 
 #[blueprint]

@@ -1,7 +1,7 @@
 mod helper;
-use oracle::{AccumulatedObservation, ObservationInterval, oracle::accumulated_log};
 use flex_pool_hooks::HookCall;
 use helper::*;
+use oracle::{oracle::accumulated_log, AccumulatedObservation, ObservationInterval};
 use pretty_assertions::assert_eq;
 use scrypto::prelude::*;
 use scrypto_testenv::environment::TestHelperExecution;
@@ -87,7 +87,6 @@ fn test_after_swap_assert_outputs_equal_inputs() {
     let mut helper = OracleTestHelper::new();
     helper.assert_outputs_equal_inputs(HookCall::AfterSwap);
 }
-
 
 // Test ranges
 
@@ -448,7 +447,6 @@ fn test_binary_search_observations(
     let output: Vec<AccumulatedObservation> = receipt.outputs("observation");
 
     assert_eq!(output, expected);
-
 }
 
 // Interpolation

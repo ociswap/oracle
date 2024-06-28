@@ -1,16 +1,16 @@
-use oracle::{AccumulatedObservation, ObservationInterval};
-use lazy_static::lazy_static;
-use scrypto::{blueprints::consensus_manager::TimePrecision, prelude::*};
-use std::mem;
-use flex_pool_hooks::{AfterInstantiateState, AfterSwapState, HookCall};
 use common::pools::SwapType;
+use flex_pool_hooks::{AfterInstantiateState, AfterSwapState, HookCall};
+use lazy_static::lazy_static;
+use oracle::{AccumulatedObservation, ObservationInterval};
 use pretty_assertions::assert_eq;
 use radix_engine::system::system_modules::execution_trace::ResourceSpecifier::Amount;
+use scrypto::{blueprints::consensus_manager::TimePrecision, prelude::*};
 use scrypto_math::*;
 use scrypto_testenv::*;
 use serde_json;
 use std::fs::File;
 use std::io::Read;
+use std::mem;
 
 lazy_static! {
     pub static ref TEST_DATAPOINTS: Vec<PreciseDecimal> = {
@@ -385,8 +385,8 @@ impl OracleTestHelper {
     pub fn new() -> Self {
         let packages: HashMap<&str, &str> = vec![
             ("oracle", this_package!()),
-            ("pool", concat!(this_package!(), "/../flex-pool")),
-            ("registry", concat!(this_package!(), "/../flex-pool/registry")),
+            ("pool", concat!(this_package!(), "/flex-pool")),
+            ("registry", concat!(this_package!(), "/flex-pool/registry")),
         ]
         .into_iter()
         .collect();

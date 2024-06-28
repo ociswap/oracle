@@ -1,7 +1,7 @@
 mod helper;
 use flex_pool_hooks::AfterSwapState;
-use oracle::AccumulatedObservation;
 use helper::*;
+use oracle::AccumulatedObservation;
 use pretty_assertions::assert_eq;
 use scrypto::prelude::*;
 use scrypto_testenv::environment::TestHelperExecution;

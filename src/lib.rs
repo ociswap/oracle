@@ -1,3 +1,3 @@
 pub mod oracle;
 
-pub use oracle::{Oracle, ObservationInterval, AccumulatedObservation};
+pub use oracle::{AccumulatedObservation, ObservationInterval, Oracle};
