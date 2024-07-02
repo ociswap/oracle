@@ -3,6 +3,8 @@ use common::time::Time;
 use oracle::{AccumulatedObservation, ObservationInterval, Oracle};
 use scrypto::prelude::*;
 
+pub const OBSERVATIONS_LIMIT: u16 = 10; // For testing
+
 // AfterInstantiateState, AfterSwapState and HookCall can be imported normally from flex_pool_hooks package.
 // They are copied in this case to avoid circular imports. A normal hook is not imported by the pool itself
 // which is the case for the oracle. This TestOracle is not a compatible hook but freely inspired by the interface.
@@ -91,7 +93,7 @@ mod test_oracle {
                 x_address: None,
                 y_address: None,
 
-                oracle: Oracle::new(),
+                oracle: Oracle::new(OBSERVATIONS_LIMIT),
 
                 last_price_sqrt: pdec!(0),
             })

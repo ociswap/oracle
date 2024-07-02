@@ -3,11 +3,6 @@ use scrypto::prelude::*;
 use scrypto_math::*;
 use std::cmp::min;
 
-// Production
-// pub const OBSERVATIONS_LIMIT: u16 = u16::MAX;
-// Testing:
-pub const OBSERVATIONS_LIMIT: u16 = 10; // u16::MAX;
-
 /// The SubObservations object is used to accumulate and manage price square root states within
 /// a given minute.
 /// When a new minute is reached, it performs a time-weighted averaging of the minute's prices,
@@ -151,15 +146,17 @@ pub struct Oracle {
     /// A SubObservations object, used for generating an average of the `price_sqrt` within each
     /// minute.
     sub_observations: Option<SubObservations>,
+    observations_limit: u16,
 }
 
 impl Oracle {
-    pub fn new() -> Self {
+    pub fn new(observations_limit: u16) -> Self {
         Oracle {
             observations: KeyValueStore::new(),
             observations_stored: 0,
             last_observation_index: None,
             sub_observations: None,
+            observations_limit,
         }
     }
 
@@ -273,14 +270,16 @@ impl Oracle {
             // The index is set to zero on the first call
             None => Some(0),
             // The index is incremented by one, and if it exceeds the limit, it wraps around to zero
-            Some(last_observation_index) => Some((last_observation_index + 1) % OBSERVATIONS_LIMIT),
+            Some(last_observation_index) => {
+                Some((last_observation_index + 1) % self.observations_limit)
+            }
         };
         self.observations
             .insert(self.last_observation_index.unwrap(), observation);
 
         // The `observations_stored` count is also incrementing, ensuring it
         // does not exceed the `OBSERVATIONS_LIMIT`.
-        self.observations_stored = min(self.observations_stored + 1, OBSERVATIONS_LIMIT);
+        self.observations_stored = min(self.observations_stored + 1, self.observations_limit);
     }
 
     /// Retrieves an `AccumulatedObservation` for a given timestamp in seconds.
@@ -424,7 +423,7 @@ impl Oracle {
 
     /// Returns the limit of observations that can be stored.
     pub fn observations_limit(&self) -> u16 {
-        OBSERVATIONS_LIMIT
+        self.observations_limit
     }
 
     /// Returns the number of observations currently stored.
