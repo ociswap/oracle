@@ -3,137 +3,6 @@ use scrypto::prelude::*;
 use scrypto_math::*;
 use std::cmp::min;
 
-/// The SubObservations object is used to accumulate and manage price square root states within
-/// a given minute.
-/// When a new minute is reached, it performs a time-weighted averaging of the minute's prices,
-/// so that the resulting value is used for logarithmic accumulation in the Oracle object.
-#[derive(ScryptoSbor)]
-pub struct SubObservations {
-    /// The sum of the product of the last price square root and the time elapsed since
-    /// the last update.
-    price_sqrt_sum: PreciseDecimal,
-    /// The last observed price square root.
-    price_sqrt_last: PreciseDecimal,
-    /// The instant when the last update (call to `new_subobservation` or `finalize`) occurred.
-    last_updated: Instant,
-    /// The instant when the sub-observations were initialized. After the initialization is
-    /// complete, this field is set to `None`.
-    initialization: Option<Instant>,
-}
-
-impl SubObservations {
-    pub fn new() -> Self {
-        Self {
-            last_updated: Clock::instant(),
-            initialization: Some(Clock::instant()),
-            price_sqrt_sum: pdec!(0),
-            price_sqrt_last: pdec!(0),
-        }
-    }
-
-    /// Updates the sub-observations with a new price square root value.
-    ///
-    /// This method is called at the end of every swap, to inform the oracle of the lastest
-    /// pool `price_sqrt`. It performs the time-weighted accumulation of the `price_sqrt`s
-    /// during each minute.
-    ///
-    /// # Arguments
-    ///
-    /// * `price_sqrt` - A `PreciseDecimal` representing the new price square root to be observed.
-    pub fn new_subobservation(&mut self, price_sqrt: PreciseDecimal) {
-        let current_instant = Clock::instant();
-
-        if current_instant != self.last_updated {
-            let delta_marginal_seconds =
-                current_instant.seconds_marginal() - self.last_updated.seconds_marginal();
-            self.price_sqrt_sum += self.price_sqrt_last * delta_marginal_seconds;
-            self.last_updated = current_instant;
-        }
-
-        // Updates `price_sqrt_last` without performing accumulation if no seconds have elapsed
-        // since the last swap. This approach ensures that for multiple swaps within the
-        // same second, only the last swap's price is considered.
-        // This mechanism is crucial as the code cannot predict if a swap will be the last within
-        // a given second.
-        self.price_sqrt_last = price_sqrt;
-    }
-
-    /// Calculates the time-weighted average `price_sqrt` for the last active minute
-    /// (at which swaps took place) and resets the SubObservations object in order to
-    /// prepare it for the new minute, by setting the time properly and resetting the
-    /// `price_sqrt_sum`.
-    ///
-    /// # Returns
-    ///
-    /// Returns the time-weighted average `price_sqrt` for the last active minute.
-    pub fn finalize(&mut self) -> PreciseDecimal {
-        // Below, the duration across which the `price_sqrt_sum` is averaged is conditionally
-        // set to either:
-        // 1) The number of seconds passed between the first swap and the end of the minute,
-        //  if this is the first minute being recorded by the SubMinutes object
-        // 2) 60 seconds otherwise.
-        // This ensures that the first minute is averaged fairly, from the moment at which the
-        // first swap took place.
-        let duration = match self.initialization.take() {
-            Some(instant) => 60 - instant.seconds_marginal(),
-            None => 60,
-        };
-        let price_sqrt_avg = self.price_sqrt_average(duration);
-
-        // Prepare SubObservations for new minute
-        // We set the instant rounded to the minute, as if the last transaction took place when the
-        // minute dawned.
-        // This is meant to allow the object to perform the accumulation correctly when the
-        // first swap in the minute takes place, i.e. that the new price is weighted by the number
-        // of seconds that passed since the beginning of the minute.
-        self.last_updated = Clock::current_time_rounded_to_minutes();
-        self.price_sqrt_sum = pdec!(0);
-
-        price_sqrt_avg
-    }
-
-    /// Provides a preview of the time-weighted average `price_sqrt` during the last active minute,
-    /// without changing the state of SubObservations.
-    ///
-    /// This method calculates a preview of the time-weighted average price square root without
-    /// finalizing the current observations. It is useful for getting an estimate before the minute
-    /// ends. This method asserts that no initial observation has been set yet, ensuring it's only
-    /// called under appropriate conditions.
-    ///
-    /// # Returns
-    ///
-    /// Returns the time-weighted average price square root for the current minute based on the
-    /// observations so far.
-    pub fn finalize_preview(&self) -> PreciseDecimal {
-        assert!(
-            self.initialization.is_none(),
-            "Not yet possible to retrieve this data. Please wait for a new observation to be
-            stored."
-        );
-        self.price_sqrt_average(60)
-    }
-
-    /// Calculates the time-weighted average price square root over a given duration.
-    ///
-    /// This helper method computes the time-weighted average price square root by taking into
-    /// account the sum of price square roots observed and the last observed price square root,
-    /// adjusted for the time elapsed since the last observation.
-    ///
-    /// # Arguments
-    ///
-    /// * `duration` - The duration in seconds over which to average the price square roots.
-    ///
-    /// # Returns
-    ///
-    /// Returns the time-weighted average price square root over the specified duration.
-    fn price_sqrt_average(&self, duration: u64) -> PreciseDecimal {
-        let delta_marginal_seconds = 60 - self.last_updated.seconds_marginal();
-        let price_sqrt_sum = self.price_sqrt_sum + self.price_sqrt_last * delta_marginal_seconds;
-
-        price_sqrt_sum / duration
-    }
-}
-
 #[derive(ScryptoSbor)]
 pub struct Oracle {
     /// A key-value store holding accumulated observations, indexed by a u16, allowing for a
@@ -481,6 +350,137 @@ impl Oracle {
     fn oldest_index(&self) -> Option<u16> {
         self.last_observation_index
             .map(|index| (index + 1) % self.observations_stored)
+    }
+}
+
+/// The SubObservations object is used to accumulate and manage price square root states within
+/// a given minute.
+/// When a new minute is reached, it performs a time-weighted averaging of the minute's prices,
+/// so that the resulting value is used for logarithmic accumulation in the Oracle object.
+#[derive(ScryptoSbor)]
+pub struct SubObservations {
+    /// The sum of the product of the last price square root and the time elapsed since
+    /// the last update.
+    price_sqrt_sum: PreciseDecimal,
+    /// The last observed price square root.
+    price_sqrt_last: PreciseDecimal,
+    /// The instant when the last update (call to `new_subobservation` or `finalize`) occurred.
+    last_updated: Instant,
+    /// The instant when the sub-observations were initialized. After the initialization is
+    /// complete, this field is set to `None`.
+    initialization: Option<Instant>,
+}
+
+impl SubObservations {
+    pub fn new() -> Self {
+        Self {
+            last_updated: Clock::instant(),
+            initialization: Some(Clock::instant()),
+            price_sqrt_sum: pdec!(0),
+            price_sqrt_last: pdec!(0),
+        }
+    }
+
+    /// Updates the sub-observations with a new price square root value.
+    ///
+    /// This method is called at the end of every swap, to inform the oracle of the lastest
+    /// pool `price_sqrt`. It performs the time-weighted accumulation of the `price_sqrt`s
+    /// during each minute.
+    ///
+    /// # Arguments
+    ///
+    /// * `price_sqrt` - A `PreciseDecimal` representing the new price square root to be observed.
+    pub fn new_subobservation(&mut self, price_sqrt: PreciseDecimal) {
+        let current_instant = Clock::instant();
+
+        if current_instant != self.last_updated {
+            let delta_marginal_seconds =
+                current_instant.seconds_marginal() - self.last_updated.seconds_marginal();
+            self.price_sqrt_sum += self.price_sqrt_last * delta_marginal_seconds;
+            self.last_updated = current_instant;
+        }
+
+        // Updates `price_sqrt_last` without performing accumulation if no seconds have elapsed
+        // since the last swap. This approach ensures that for multiple swaps within the
+        // same second, only the last swap's price is considered.
+        // This mechanism is crucial as the code cannot predict if a swap will be the last within
+        // a given second.
+        self.price_sqrt_last = price_sqrt;
+    }
+
+    /// Calculates the time-weighted average `price_sqrt` for the last active minute
+    /// (at which swaps took place) and resets the SubObservations object in order to
+    /// prepare it for the new minute, by setting the time properly and resetting the
+    /// `price_sqrt_sum`.
+    ///
+    /// # Returns
+    ///
+    /// Returns the time-weighted average `price_sqrt` for the last active minute.
+    pub fn finalize(&mut self) -> PreciseDecimal {
+        // Below, the duration across which the `price_sqrt_sum` is averaged is conditionally
+        // set to either:
+        // 1) The number of seconds passed between the first swap and the end of the minute,
+        //  if this is the first minute being recorded by the SubMinutes object
+        // 2) 60 seconds otherwise.
+        // This ensures that the first minute is averaged fairly, from the moment at which the
+        // first swap took place.
+        let duration = match self.initialization.take() {
+            Some(instant) => 60 - instant.seconds_marginal(),
+            None => 60,
+        };
+        let price_sqrt_avg = self.price_sqrt_average(duration);
+
+        // Prepare SubObservations for new minute
+        // We set the instant rounded to the minute, as if the last transaction took place when the
+        // minute dawned.
+        // This is meant to allow the object to perform the accumulation correctly when the
+        // first swap in the minute takes place, i.e. that the new price is weighted by the number
+        // of seconds that passed since the beginning of the minute.
+        self.last_updated = Clock::current_time_rounded_to_minutes();
+        self.price_sqrt_sum = pdec!(0);
+
+        price_sqrt_avg
+    }
+
+    /// Provides a preview of the time-weighted average `price_sqrt` during the last active minute,
+    /// without changing the state of SubObservations.
+    ///
+    /// This method calculates a preview of the time-weighted average price square root without
+    /// finalizing the current observations. It is useful for getting an estimate before the minute
+    /// ends. This method asserts that no initial observation has been set yet, ensuring it's only
+    /// called under appropriate conditions.
+    ///
+    /// # Returns
+    ///
+    /// Returns the time-weighted average price square root for the current minute based on the
+    /// observations so far.
+    pub fn finalize_preview(&self) -> PreciseDecimal {
+        assert!(
+            self.initialization.is_none(),
+            "Not yet possible to retrieve this data. Please wait for a new observation to be
+            stored."
+        );
+        self.price_sqrt_average(60)
+    }
+
+    /// Calculates the time-weighted average price square root over a given duration.
+    ///
+    /// This helper method computes the time-weighted average price square root by taking into
+    /// account the sum of price square roots observed and the last observed price square root,
+    /// adjusted for the time elapsed since the last observation.
+    ///
+    /// # Arguments
+    ///
+    /// * `duration` - The duration in seconds over which to average the price square roots.
+    ///
+    /// # Returns
+    ///
+    /// Returns the time-weighted average price square root over the specified duration.
+    fn price_sqrt_average(&self, duration: u64) -> PreciseDecimal {
+        let delta_marginal_seconds = 60 - self.last_updated.seconds_marginal();
+        let price_sqrt_sum = self.price_sqrt_sum + self.price_sqrt_last * delta_marginal_seconds;
+
+        price_sqrt_sum / duration
     }
 }
 
