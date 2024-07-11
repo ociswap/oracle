@@ -64,6 +64,7 @@ mod test_oracle {
             observation_intervals => PUBLIC;
             observations_stored => PUBLIC;
             last_observation_index => PUBLIC;
+            oldest_observation_timestamp => PUBLIC;
             after_instantiate => restrict_to: [hook_admin];
             after_swap => restrict_to: [hook_admin];
         }
@@ -172,6 +173,10 @@ mod test_oracle {
 
         pub fn observations_stored(&self) -> u16 {
             self.oracle.observations_stored()
+        }
+
+        pub fn oldest_observation_timestamp(&self) -> Option<u64> {
+            self.oracle.oldest_observation_timestamp()
         }
 
         // For testing

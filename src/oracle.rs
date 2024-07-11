@@ -325,7 +325,7 @@ impl Oracle {
         // Assert that the target timestamp is in the allowed range
         // (oldest_timestamp <= target_minutes <= now)
         let oldest_timestamp = self
-            .oldest_observation_timestamp()
+            .oldest_observation_timestamp_minutes()
             .expect("No observations exist yet.");
         assert!(
             target_minutes >= oldest_timestamp && target_minutes <= now_minutes,
@@ -422,28 +422,62 @@ impl Oracle {
     }
 
     /// Returns the limit of observations that can be stored.
+    ///
+    /// # Returns
+    ///
+    /// A `u16` value representing the maximum number of observations that can be stored in the oracle.
     pub fn observations_limit(&self) -> u16 {
         self.observations_limit
     }
 
     /// Returns the number of observations currently stored.
+    ///
+    /// # Returns
+    ///
+    /// A `u16` value representing the number of observations currently stored in the oracle.
     pub fn observations_stored(&self) -> u16 {
         self.observations_stored
     }
 
-    /// Returns the timestamp of the oldest observation, if any.
-    pub fn oldest_observation_timestamp(&self) -> Option<u64> {
+    /// Returns the timestamp of the oldest observation in minutes, if any.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<u64>` containing the timestamp of the oldest observation in minutes,
+    /// or `None` if there are no observations.
+    fn oldest_observation_timestamp_minutes(&self) -> Option<u64> {
         self.oldest_index()
             .and_then(|index| self.observations.get(&index))
             .map(|obs| obs.timestamp)
     }
 
+    /// Returns the timestamp of the oldest observation in seconds, if any.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<u64>` containing the timestamp of the oldest observation in seconds,
+    /// or `None` if there are no observations.
+    pub fn oldest_observation_timestamp(&self) -> Option<u64> {
+        self.oldest_observation_timestamp_minutes()
+            .map(|timestamp| timestamp * 60)
+    }
+
     /// Returns the index of the last observation for testing purposes.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<u16>` containing the index of the last observation,
+    /// or `None` if there are no observations.
     pub fn last_observation_index(&self) -> Option<u16> {
         self.last_observation_index
     }
 
     /// Returns the index of the oldest observation.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<u16>` containing the index of the oldest observation,
+    /// or `None` if there are no observations.
     fn oldest_index(&self) -> Option<u16> {
         self.last_observation_index
             .map(|index| (index + 1) % self.observations_stored)
