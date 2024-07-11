@@ -644,7 +644,7 @@ fn binary_search_and_interpolation(
 ///
 /// # Returns
 /// * `Decimal` - The interpolated y-coordinate (value) of the target point.
-fn linear_interpolation(
+pub fn linear_interpolation(
     x_left: u64,
     x_right: u64,
     y_left: Decimal,
