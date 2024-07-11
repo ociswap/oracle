@@ -1,4 +1,4 @@
-# Ociswap's Price Oracle
+# Ociswap Price Oracle
 
 The price oracle described in this document aims to provide to provide reliable and secure price feeds to various decentralized applications (DApps) running on the Radix DLT network. By utilizing this oracle, DApps can access accurate and up-to-date price information, which is critical for functions such as asset trading, collateral calculations, and financial derivatives.
 
