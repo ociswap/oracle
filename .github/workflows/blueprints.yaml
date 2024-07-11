@@ -27,4 +27,4 @@ jobs:
           cache-on-failure: "true"
           cache-all-crates: "true"
 
-      - run: cargo test --all --profile=dev --no-fail-fast
+      - run: cargo test --profile=dev --no-fail-fast
