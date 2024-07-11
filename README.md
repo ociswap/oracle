@@ -65,7 +65,7 @@ The Oracle module provides several interfaces to interact with and retrieve data
 
 - `observations_stored() -> u16`: This interface returns the number of observations currently stored in the oracle. Once the limit is reached, the oldest observations are overwritted as needed.
 
-- `oldest_observation_timestamp() -> Option<u64>`: This interface returns the timestamp of the oldest observation, if any. It is useful for determining the earliest point in time for which the oracle has data.
+- `oldest_observation_at() -> Option<u64>`: This interface returns the timestamp of the oldest observation, if any. It is useful for determining the earliest point in time for which the oracle has data.
 
 
 

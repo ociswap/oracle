@@ -668,16 +668,15 @@ impl OracleTestHelper {
         self
     }
 
-    pub fn oldest_observation_timestamp(&mut self) -> &mut OracleTestHelper {
+    pub fn oldest_observation_at(&mut self) -> &mut OracleTestHelper {
         let manifest_builder = mem::take(&mut self.env.manifest_builder);
 
         self.env().manifest_builder = manifest_builder.call_method(
             self.oracle_address.unwrap(),
-            "oldest_observation_timestamp",
+            "oldest_observation_at",
             manifest_args!(),
         );
-        self.env
-            .new_instruction("oldest_observation_timestamp", 1, 0);
+        self.env.new_instruction("oldest_observation_at", 1, 0);
         self
     }
 
