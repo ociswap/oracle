@@ -48,7 +48,7 @@ pub enum HookCall {
 }
 
 /*
-This is not a production grade hook, but
+This is not a production grade hook, but is solely for testing the oracle
 */
 #[blueprint]
 #[types(u16, AccumulatedObservation)]
@@ -64,7 +64,7 @@ mod test_oracle {
             observation_intervals => PUBLIC;
             observations_stored => PUBLIC;
             last_observation_index => PUBLIC;
-            oldest_observation_timestamp => PUBLIC;
+            oldest_observation_at => PUBLIC;
             after_instantiate => restrict_to: [hook_admin];
             after_swap => restrict_to: [hook_admin];
         }
@@ -175,8 +175,8 @@ mod test_oracle {
             self.oracle.observations_stored()
         }
 
-        pub fn oldest_observation_timestamp(&self) -> Option<u64> {
-            self.oracle.oldest_observation_timestamp()
+        pub fn oldest_observation_at(&self) -> Option<u64> {
+            self.oracle.oldest_observation_at()
         }
 
         // For testing

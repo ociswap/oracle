@@ -194,7 +194,7 @@ impl Oracle {
         // Assert that the target timestamp is in the allowed range
         // (oldest_timestamp <= target_minutes <= now)
         let oldest_timestamp = self
-            .oldest_observation_timestamp_minutes()
+            .oldest_observation_at_minutes()
             .expect("No observations exist yet.");
         assert!(
             target_minutes >= oldest_timestamp && target_minutes <= now_minutes,
@@ -314,7 +314,7 @@ impl Oracle {
     ///
     /// An `Option<u64>` containing the timestamp of the oldest observation in minutes,
     /// or `None` if there are no observations.
-    fn oldest_observation_timestamp_minutes(&self) -> Option<u64> {
+    fn oldest_observation_at_minutes(&self) -> Option<u64> {
         self.oldest_index()
             .and_then(|index| self.observations.get(&index))
             .map(|obs| obs.timestamp)
@@ -326,8 +326,8 @@ impl Oracle {
     ///
     /// An `Option<u64>` containing the timestamp of the oldest observation in seconds,
     /// or `None` if there are no observations.
-    pub fn oldest_observation_timestamp(&self) -> Option<u64> {
-        self.oldest_observation_timestamp_minutes()
+    pub fn oldest_observation_at(&self) -> Option<u64> {
+        self.oldest_observation_at_minutes()
             .map(|timestamp| timestamp * 60)
     }
 
