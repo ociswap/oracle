@@ -344,6 +344,24 @@ fn test_last_observation_index(timestamps: Range<u64>, expected: Option<u16>) {
     assert_eq!(outputs, vec![expected]);
 }
 
+// Oldest observation timestamp
+#[test_case(4..4, None)]
+#[test_case(4..5, Some(240))]
+#[test_case(4..14, Some(240))]
+#[test_case(4..15, Some(300))]
+#[test_case(4..16, Some(360))]
+fn test_oldest_observation_timestamp(timestamps: Range<u64>, expected: Option<u64>) {
+    let timestamps: Vec<u64> = timestamps.collect();
+    let mut helper = OracleTestHelper::new_with_observations_minutes(&timestamps);
+
+    helper.oldest_observation_timestamp();
+    let outputs: Vec<Option<u64>> = helper
+        .execute_expect_success(false)
+        .outputs("oldest_observation_timestamp");
+
+    assert_eq!(outputs, vec![expected]);
+}
+
 // Get observation special cases
 
 #[test]

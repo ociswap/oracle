@@ -668,6 +668,19 @@ impl OracleTestHelper {
         self
     }
 
+    pub fn oldest_observation_timestamp(&mut self) -> &mut OracleTestHelper {
+        let manifest_builder = mem::take(&mut self.env.manifest_builder);
+
+        self.env().manifest_builder = manifest_builder.call_method(
+            self.oracle_address.unwrap(),
+            "oldest_observation_timestamp",
+            manifest_args!(),
+        );
+        self.env
+            .new_instruction("oldest_observation_timestamp", 1, 0);
+        self
+    }
+
     pub fn last_observation_index(&mut self) -> &mut OracleTestHelper {
         let manifest_builder = mem::take(&mut self.env.manifest_builder);
 
@@ -1092,7 +1105,7 @@ pub fn generate_oracle_data(
 
         println!(
             "OBSERVATION {}:\nAcc_log: {}\nfinalized: {}\nleaked_value: {}\nminutes_since_last: {}\nresult: {}",
-            i,
+            i - 1,
             last_observation.price_sqrt_log_acc,
             averages[i - 1],
             last_values[i - 1],
