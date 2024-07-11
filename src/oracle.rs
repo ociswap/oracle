@@ -567,13 +567,13 @@ pub fn accumulated_log(
 /// Returns an AccumulatedObservation instance. This will either be the observation that exactly
 /// matches the `target_timestamp`, or an interpolated observation between the two closest
 /// timestamps.
-pub fn binary_search_and_interpolation(
+fn binary_search_and_interpolation(
     observations: &KeyValueStore<u16, AccumulatedObservation>,
     oldest_index: u16,
     observations_stored: u16,
     target_timestamp: u64,
 ) -> AccumulatedObservation {
-    // Binary search
+    // The binary search is always called with target_timestamp within the range [left, right]
     let mut left = oldest_index;
     let mut right = left + observations_stored - 1;
 
@@ -586,16 +586,30 @@ pub fn binary_search_and_interpolation(
             return observation_mid.clone();
         }
 
+        // This situation occurs only when left and right are adjacent (index distance < 2).
+        // If the index distance between left and right is greater than 1, then mid will be greater than left.
+        // The case where mid equals left is already handled when mid is the target.
         if mid == left {
             let index_right = right % observations_stored;
             let observation_right = observations.get(&index_right).unwrap();
 
+            // Unlike a regular binary search, we perform interpolation when only two elements remain,
+            // and neither the left nor right element matches the target timestamp.
+            // To prevent infinite loops, we return the observation_right if it is the target.
+            // This situation occurs when left and right are adjacent, and right is the target.
+            // For this to happen, the target must be the last observation (initially right), otherwise, we never reach this point,
+            // because the right was the previous mid, and we always check if mid is the target first.
+            // Only in the first iteration can mid be left and the target be right simultaneously.
             if observation_right.timestamp == target_timestamp {
                 return observation_right.clone();
             }
             break (observation_mid, observation_right);
         }
 
+        // In this binary search variant, we avoid adjusting mid by +1 or -1 because we will interpolate between the final two elements.
+        // To prevent infinite loops, we check if observation_right's timestamp matches the target_timestamp when mid equals left.
+        // At this stage, observation_mid.timestamp is guaranteed not to equal the target timestamp.
+        // Until left and right are not adjacent and directly next to each other we will make progress in each iteration.
         if observation_mid.timestamp < target_timestamp {
             left = mid;
         } else {
@@ -630,7 +644,7 @@ pub fn binary_search_and_interpolation(
 ///
 /// # Returns
 /// * `Decimal` - The interpolated y-coordinate (value) of the target point.
-fn linear_interpolation(
+pub fn linear_interpolation(
     x_left: u64,
     x_right: u64,
     y_left: Decimal,
