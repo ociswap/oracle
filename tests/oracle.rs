@@ -512,7 +512,7 @@ fn test_observation_intervals_left_lesser_than_right() {
     let result: Vec<Vec<ObservationInterval>> = receipt.outputs("observation_intervals");
 
     let expected = get_intervals_from_observation_minutes(&minutes, &intervals);
-    // assert_vecs_similar(result, vec![expected]);
+
     assert_eq!(result, vec![expected]);
 }
 
@@ -552,7 +552,6 @@ fn test_observation_intervals_left_equal_right() {
 fn test_observation_intervals() {
     let timestamps: Vec<u64> = (4..14).collect();
 
-    // let intervals: Vec<(u64, u64)> = vec![(3, 8)];
     let intervals: Vec<(u64, u64)> = vec![(4, 13), (5, 7), (7, 12)];
     let intervals_in_seconds: Vec<(u64, u64)> = intervals
         .iter()
@@ -577,7 +576,6 @@ fn test_observation_intervals_seconds_rounding() {
     let timestamps: Vec<u64> = (4..14).collect();
     let swap_seconds = convert_observation_minutes_to_swap_state_seconds(&timestamps);
 
-    // let intervals: Vec<(u64, u64)> = vec![(3, 8)];
     let intervals_in_seconds: Vec<(u64, u64)> = vec![(635, 660), (660, 735)];
 
     let mut helper = OracleTestHelper::new_with_observations_minutes(&timestamps);
