@@ -428,6 +428,10 @@ fn test_observation_timestamp_later_than_last_but_before_current() {
 
 // Test binary search
 
+#[test_case(4..5, 4..5, true; "one")] // last observation returned directly (no binary search)
+#[test_case(4..6, 4..6, true; "two")]
+#[test_case(4..6, 5..6, true; "two_only_last")] // last observation returned directly (no binary search)
+#[test_case(4..9, 7..8, true; "second_last")]
 #[test_case(4..14, 4..14, true; "even")]
 #[test_case(4..13, 4..13, true; "odd")]
 #[test_case(4..20, 10..20, true; "even_above_limit")]
