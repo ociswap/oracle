@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 sbor = "1.2.0"
 scrypto = "1.2.0"
-common = { git = "https://github.com/ociswap/pools-common", tag = "v1.2.1" }
+common = { git = "https://github.com/ociswap/pools-common", tag = "v1.2.2" }
 oracle = { path = ".." }
 
 [lib]

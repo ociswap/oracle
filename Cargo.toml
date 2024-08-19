@@ -10,7 +10,7 @@ repository = "https://github.com/ociswap/oracle"
 sbor = "1.2.0"
 scrypto = "1.2.0"
 scrypto_math = { git = "https://github.com/ociswap/scrypto-math", tag = "v0.6.0" }
-common = { git = "https://github.com/ociswap/pools-common", tag = "v1.2.1" }
+common = { git = "https://github.com/ociswap/pools-common", tag = "v1.2.2" }
 
 [dev-dependencies]
 radix-engine = "1.2.0"
